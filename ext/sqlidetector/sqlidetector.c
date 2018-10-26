@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author:                                                              |
+  | Author: Albin Kauffmann <albin@kauff.org>                            |
   +----------------------------------------------------------------------+
 */
 
@@ -26,6 +26,9 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_sqlidetector.h"
+
+#include "libinjection.h"
+#include "libinjection_sqli.h"
 
 /* If you declare any globals in php_sqlidetector.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(sqlidetector)
@@ -51,19 +54,19 @@ PHP_INI_END()
 /* Every user-visible function in PHP should document itself in the source */
 /* {{{ proto string confirm_sqlidetector_compiled(string arg)
    Return a string to confirm that the module is compiled in */
-PHP_FUNCTION(confirm_sqlidetector_compiled)
+PHP_FUNCTION(sqli_check)
 {
+	struct libinjection_sqli_state state;
 	char *arg = NULL;
 	size_t arg_len, len;
-	zend_string *strg;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arg, &arg_len) == FAILURE) {
 		return;
 	}
 
-	strg = strpprintf(0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "sqlidetector", arg);
+	libinjection_sqli_init(&state, arg, arg_len, FLAG_NONE);
 
-	RETURN_STR(strg);
+	RETURN_BOOL(libinjection_is_sqli(&state));
 }
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and
@@ -146,8 +149,8 @@ PHP_MINFO_FUNCTION(sqlidetector)
  * Every user visible function must have an entry in sqlidetector_functions[].
  */
 const zend_function_entry sqlidetector_functions[] = {
-	PHP_FE(confirm_sqlidetector_compiled,	NULL)		/* For testing, remove later. */
-	PHP_FE_END	/* Must be the last line in sqlidetector_functions[] */
+	PHP_FE(sqli_check, NULL)
+	PHP_FE_END
 };
 /* }}} */
 

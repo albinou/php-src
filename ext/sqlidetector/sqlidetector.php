@@ -11,11 +11,18 @@ foreach($functions as $func) {
     echo $func."$br\n";
 }
 echo "$br\n";
-$function = 'confirm_' . $module . '_compiled';
-if (extension_loaded($module)) {
-	$str = $function($module);
-} else {
-	$str = "Module $module is not compiled into PHP";
+
+$strings = array(
+    "Bob",
+    "-1' and 1=1 union/* foo */select load_file('/etc/passwd')--",
+    "75001"
+);
+foreach($strings as $str) {
+    if(sqli_check($str)) {
+        echo "\"$str\" contains an SQL injection\n";
+    } else {
+        echo "\"$str\" does not contain SQL injections\n";
+    }
 }
-echo "$str\n";
+
 ?>
