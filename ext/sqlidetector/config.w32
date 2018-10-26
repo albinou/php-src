@@ -1,0 +1,9 @@
+// $Id$
+// vim:ft=javascript
+
+ARG_ENABLE("sqlidetector", "enable sqlidetector support", "no");
+
+if (PHP_SQLIDETECTOR != "no") {
+	EXTENSION("sqlidetector", "sqlidetector.c", PHP_EXTNAME_SHARED, "/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1");
+}
+
