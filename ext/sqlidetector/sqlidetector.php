@@ -18,7 +18,7 @@ $strings = array(
     "75001"
 );
 foreach($strings as $str) {
-    if(sqli_check($str)) {
+    if(is_sqli($str)) {
         echo "\"$str\" contains an SQL injection\n";
     } else {
         echo "\"$str\" does not contain SQL injections\n";

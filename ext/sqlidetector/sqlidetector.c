@@ -30,31 +30,9 @@
 #include "libinjection.h"
 #include "libinjection_sqli.h"
 
-/* If you declare any globals in php_sqlidetector.h uncomment this:
-ZEND_DECLARE_MODULE_GLOBALS(sqlidetector)
-*/
-
-/* True global resources - no need for thread safety here */
-static int le_sqlidetector;
-
-/* {{{ PHP_INI
- */
-/* Remove comments and fill if you need to have entries in php.ini
-PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("sqlidetector.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_sqlidetector_globals, sqlidetector_globals)
-    STD_PHP_INI_ENTRY("sqlidetector.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_sqlidetector_globals, sqlidetector_globals)
-PHP_INI_END()
-*/
-/* }}} */
-
-/* Remove the following function when you have successfully modified config.m4
-   so that your module can be compiled into PHP, it exists only for testing
-   purposes. */
-
-/* Every user-visible function in PHP should document itself in the source */
-/* {{{ proto string confirm_sqlidetector_compiled(string arg)
-   Return a string to confirm that the module is compiled in */
-PHP_FUNCTION(sqli_check)
+/* {{{ proto bool is_sqli(string arg)
+   Return true if the arg user-input looks like an SQL injection */
+PHP_FUNCTION(is_sqli)
 {
 	struct libinjection_sqli_state state;
 	char *arg = NULL;
@@ -69,31 +47,11 @@ PHP_FUNCTION(sqli_check)
 	RETURN_BOOL(libinjection_is_sqli(&state));
 }
 /* }}} */
-/* The previous line is meant for vim and emacs, so it can correctly fold and
-   unfold functions in source code. See the corresponding marks just before
-   function definition, where the functions purpose is also documented. Please
-   follow this convention for the convenience of others editing your code.
-*/
-
-
-/* {{{ php_sqlidetector_init_globals
- */
-/* Uncomment this function if you have INI entries
-static void php_sqlidetector_init_globals(zend_sqlidetector_globals *sqlidetector_globals)
-{
-	sqlidetector_globals->global_value = 0;
-	sqlidetector_globals->global_string = NULL;
-}
-*/
-/* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(sqlidetector)
 {
-	/* If you have INI entries, uncomment these lines
-	REGISTER_INI_ENTRIES();
-	*/
 	return SUCCESS;
 }
 /* }}} */
@@ -101,30 +59,6 @@ PHP_MINIT_FUNCTION(sqlidetector)
 /* {{{ PHP_MSHUTDOWN_FUNCTION
  */
 PHP_MSHUTDOWN_FUNCTION(sqlidetector)
-{
-	/* uncomment this line if you have INI entries
-	UNREGISTER_INI_ENTRIES();
-	*/
-	return SUCCESS;
-}
-/* }}} */
-
-/* Remove if there's nothing to do at request start */
-/* {{{ PHP_RINIT_FUNCTION
- */
-PHP_RINIT_FUNCTION(sqlidetector)
-{
-#if defined(COMPILE_DL_SQLIDETECTOR) && defined(ZTS)
-	ZEND_TSRMLS_CACHE_UPDATE();
-#endif
-	return SUCCESS;
-}
-/* }}} */
-
-/* Remove if there's nothing to do at request end */
-/* {{{ PHP_RSHUTDOWN_FUNCTION
- */
-PHP_RSHUTDOWN_FUNCTION(sqlidetector)
 {
 	return SUCCESS;
 }
@@ -149,7 +83,7 @@ PHP_MINFO_FUNCTION(sqlidetector)
  * Every user visible function must have an entry in sqlidetector_functions[].
  */
 const zend_function_entry sqlidetector_functions[] = {
-	PHP_FE(sqli_check, NULL)
+	PHP_FE(is_sqli, NULL)
 	PHP_FE_END
 };
 /* }}} */
@@ -162,8 +96,8 @@ zend_module_entry sqlidetector_module_entry = {
 	sqlidetector_functions,
 	PHP_MINIT(sqlidetector),
 	PHP_MSHUTDOWN(sqlidetector),
-	PHP_RINIT(sqlidetector),		/* Replace with NULL if there's nothing to do at request start */
-	PHP_RSHUTDOWN(sqlidetector),	/* Replace with NULL if there's nothing to do at request end */
+	NULL,
+	NULL,
 	PHP_MINFO(sqlidetector),
 	PHP_SQLIDETECTOR_VERSION,
 	STANDARD_MODULE_PROPERTIES
