@@ -1,13 +1,13 @@
 --TEST--
-Check if is_sqli() returns true in presence of an SQL injection
+Check if is_sqli() returns false in case no SQL injection is found
 --SKIPIF--
 <?php if (!extension_loaded("sqlidetector")) print "skip"; ?>
 --FILE--
 <?php
-if (is_sqli("-1' and 1=1 union/* foo */select load_file('/etc/passwd')--")) {
+if (is_sqli("SELECT * from users;")) {
     echo "SQL injection found";
 } else {
     echo "No SQL injection found";
 }
 --EXPECT--
-SQL injection found
+No SQL injection found
